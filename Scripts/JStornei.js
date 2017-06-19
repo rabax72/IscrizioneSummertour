@@ -282,13 +282,19 @@ function GetGiocatoriByIdSquadra(idSquadra) {
             //corsiGlobal = response.d;           
            
             //console.log(risultati);
-            var giocatori = '';
+            var giocatori = '<table>';
+            var tipoCertificato = '';
             for (var i = 0; i < risultati.length; i++) {
-                                               
-                giocatori = giocatori + '<li>' +
-                                        '<b>' + risultati[i].Cognome + ' ' + risultati[i].Nome + '</b>     <img src="' + risultati[i].certificatoPresente + '" />' +
-                                        '</li>';               
+                if (risultati[i].certificatoPresente == 'themes/images/certificato_assente.png') {
+                    tipoCertificato = 'Certificato non caricato o non in regola!';
+                } else {
+                    tipoCertificato = 'Certificato in regola!';
+                }
+                giocatori = giocatori + '<tr>' +
+                                        '<td>' + risultati[i].Cognome.toUpperCase() + ' ' + risultati[i].Nome.toUpperCase() + '</td><td><img src="' + risultati[i].certificatoPresente + '" alt="' + tipoCertificato + '" title="' + tipoCertificato + '" /></td>' +
+                                        '</tr>';               
             }
+            giocatori = giocatori + '</table>';
 
             $('#idsquadra_' + idSquadra).html(giocatori);
 
