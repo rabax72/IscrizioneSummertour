@@ -179,17 +179,20 @@ function GetDettaglioCategoria(idTorneo, idCategoria) {
             var descCategoria = '';
             var descPagamento = '';
             var squadreIscritte = '';
+            var postiLiberi = '';
             for (var i = 0; i < risultati.length; i++) {
                 $('#TorneoScelto').html(risultati[i].Nometorneo);
                 
                 descCategoria = risultati[i].DescCategoria;
                 descPagamento = risultati[i].DescPagamento;
                 squadreIscritte = risultati[i].NumeroSquadreIscritte;
+                postiLiberi = risultati[i].NumeroMaxSquadreAccettate - risultati[i].NumeroSquadreIscritte;
             }
         
             $("#DescCategoriaTorneo").html(descCategoria);
             $("#DescPagamentoCategoria").html(descPagamento);
             $(".squadreIscritte").html(squadreIscritte);
+            $(".postiLiberi").html(postiLiberi);
         }
 
     })
@@ -313,6 +316,7 @@ function GetGiocatoriByIdSquadra(idSquadra) {
                                         '<td>' + referente + '</td>' +
                                         '</tr>';                
             }
+            giocatori = giocatori + '<tr><td colspan="3"><a href="#" class="ui-btn ui-btn-inline" id="addPlayerInTeam_' + idSquadra + '">Aggiungiti a questa squadra</a></td></tr>';
             giocatori = giocatori + '</table>';
 
             $('#idsquadra_' + idSquadra).html(giocatori);
