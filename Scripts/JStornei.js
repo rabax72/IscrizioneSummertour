@@ -55,11 +55,16 @@ function GetTornei() {
             //corsiGlobal = response.d;           
             var dettaglio = '';
             //console.log(risultati);
+            var immagineTorneo = '';
             for (var i = 0; i < risultati.length; i++) {
-               
+                if (risultati[i].TipoTorneo == 'green') {
+                    immagineTorneo = 'themes/images/green-volley-64.png';
+                } else {
+                    immagineTorneo = 'themes/images/volleyball_64.png';
+                }
                     dettaglio = dettaglio + '<li>' +
                                     '<a href="javascript:GetDettaglioTorneo(' + risultati[i].idTorneo + ')" class="dettTorneo" idtorneo="' + risultati[i].idTorneo + '">' +
-                                    '<img src="themes/images/volleyball_64.png" alt="' + risultati[i].Nometorneo + '" />' +
+                                    '<img src="' + immagineTorneo + '" alt="' + risultati[i].Nometorneo + '" />' +
                                     '<h2>' + risultati[i].Nometorneo + '</h2>' +
                                     '<p>' + risultati[i].Inizio + ' - ' + risultati[i].Luogo + '</p>' +
                                     '</a>' +
@@ -173,16 +178,18 @@ function GetDettaglioCategoria(idTorneo, idCategoria) {
 
             var descCategoria = '';
             var descPagamento = '';
+            var squadreIscritte = '';
             for (var i = 0; i < risultati.length; i++) {
                 $('#TorneoScelto').html(risultati[i].Nometorneo);
                 
                 descCategoria = risultati[i].DescCategoria;
                 descPagamento = risultati[i].DescPagamento;
+                squadreIscritte = risultati[i].NumeroSquadreIscritte;
             }
         
             $("#DescCategoriaTorneo").html(descCategoria);
             $("#DescPagamentoCategoria").html(descPagamento);
-
+            $(".squadreIscritte").html(squadreIscritte);
         }
 
     })
@@ -214,22 +221,26 @@ function GetDettaglioCategoria(idTorneo, idCategoria) {
             var dettaglio = '';
             //console.log(risultati);
             var idSquadre = [];
-            var elencoSquadre = '<ul data-role="listview" data-inset="true" data-shadow="false">';
+            var elencoSquadre = '';
             for (var i = 0; i < risultati.length; i++) {
+                elencoSquadre = elencoSquadre + '<div data-role="collapsible">';
+                elencoSquadre = elencoSquadre + '<h2>' + risultati[i].NomeSquadra + '</h2>';
+                elencoSquadre = elencoSquadre + '<ul data-role="listview" data-inset="true" data-shadow="false">';
+                elencoSquadre = elencoSquadre +'<li data-iconpos="right" data-inset="false">';
                 
-                elencoSquadre = elencoSquadre +'<li data-role="collapsible" data-iconpos="right" data-inset="false">';
-                elencoSquadre = elencoSquadre + '<h2>' + risultati[i].NomeSquadra + ' 1</h2>';
                 elencoSquadre = elencoSquadre + '<ul data-role="listview" id="idsquadra_' + risultati[i].idSquadra + '">';
                 //elencoSquadre = elencoSquadre + '<li>Giocatore 1</li>';
                 elencoSquadre = elencoSquadre + '</ul>';
                 elencoSquadre = elencoSquadre + '</li>';
+                elencoSquadre = elencoSquadre + '</ul>';
+                elencoSquadre = elencoSquadre + '</div>';
                 //GetGiocatoriByIdSquadra(risultati[i].idSquadra);
                 var idSquadra = risultati[i].idSquadra;
                 idSquadre.push(idSquadra);
 
                 GetGiocatoriByIdSquadra(idSquadra);
             }
-            elencoSquadre = elencoSquadre + '</ul>';
+            
             var squadreId = idSquadre.join();
             //GetGiocatoriByIdSquadra(squadreId);
 
@@ -290,9 +301,17 @@ function GetGiocatoriByIdSquadra(idSquadra) {
                 } else {
                     tipoCertificato = 'Certificato in regola!';
                 }
+
+                var referente = '';
+                if (risultati[i].pathImgReferente != '') {
+                    referente = '<img src="' + risultati[i].pathImgReferente + '" alt="Referente della Squadra" title="Referente della Squadra" />';
+                }
+
                 giocatori = giocatori + '<tr>' +
-                                        '<td>' + risultati[i].Cognome.toUpperCase() + ' ' + risultati[i].Nome.toUpperCase() + '</td><td><img src="' + risultati[i].certificatoPresente + '" alt="' + tipoCertificato + '" title="' + tipoCertificato + '" /></td>' +
-                                        '</tr>';               
+                                        '<td>' + risultati[i].Cognome.toUpperCase() + ' ' + risultati[i].Nome.toUpperCase() + '</td>' +
+                                        '<td><img src="' + risultati[i].certificatoPresente + '" alt="' + tipoCertificato + '" title="' + tipoCertificato + '" /></td>' +
+                                        '<td>' + referente + '</td>' +
+                                        '</tr>';                
             }
             giocatori = giocatori + '</table>';
 
