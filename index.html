@@ -3,19 +3,23 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <title>App Summertour</title>
-    <link rel="stylesheet" href="themes/AppSummertour.min.css" />
+    <script src="https://use.fontawesome.com/6434110a3b.js"></script>
+    <link rel="stylesheet" href="themes/AppSummertour2.min.css" />
 	<link rel="stylesheet" href="themes/jquery.mobile.icons.min.css" />
 	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile.structure-1.4.5.min.css" />
+    <link rel="stylesheet" href="themes/AppSummertour_custom.css" />
 	<script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
 	<script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
-
+    
     <script src="Scripts/Config.js" type="text/javascript"></script>
     <script src="Scripts/JStornei.js" type="text/javascript"></script>
+    <script src="Scripts/JsIscrizioni.js" type="text/javascript"></script>
 </head>
 <body>
     <div data-role="page" id="landing" data-theme="a">
-		<div data-role="header" data-position="inline">
+		<div data-role="header" data-position="inline" class="barra">
 			<h1>Summertour 2017</h1>
+            <a href="#" id="logoDx" class="ui-btn"></a>
 		</div>
         <div>&nbsp;</div>
 		<div>            
@@ -100,6 +104,44 @@
                     
             </ul>           
         </div>       
+    </div>
+
+    <div data-role="page" id="paginaIscrizioneGiocatoreInSquadra" data-theme="a">
+		<div data-role="header" data-position="inline">
+            <a href="index.html" data-icon="arrow-l" class="ui-btn-left" data-rel="back">Back</a>
+			<h1>Summertour 2017</h1>
+            <h1 id="headerIscrizioneInSquadra">Iscrizione</h1>
+            
+		</div>
+        <div>&nbsp;</div>
+        <div class="ui-body ui-body-a ui-corner-all">
+            <div>
+                <a href="#" class="ui-btn ui-btn-inline" id="nomeTorneoDelGiocatore"></a>
+                <a href="#" class="ui-btn ui-btn-inline" id="nomeCategoriaDelGiocatore"></a>
+                <a href="#" class="ui-btn ui-btn-inline" id="nomeSquadraDelGiocatore"></a>
+                <br />
+                Benvenuto/a,<br />
+                procedi all'iscrizione in questa squadra inserendo il tuo Codice Fiscale.
+                
+            </div>
+		    <div class="ui-field-contain">         
+                <label for="cfGiocatore">Inserisci il tuo C.F.</label>     
+                <input type="text" maxlength="16" name="text-basic" id="cfGiocatore" data-clear-btn="true" value="" class="testoMaiuscolo" />                   
+            </div>       
+            <div>
+                <a href="#" class="ui-shadow ui-btn ui-corner-all ui-btn-inline" id="chekCFAddPlayerInTeam">Avanti</a>
+                <div id="messaggioCF"></div>
+            </div>
+        </div>
+
+        <div>&nbsp;</div>
+
+        <div class="ui-body ui-body-a ui-corner-all">
+            <div id="datiNuovoGiocatore">
+
+            </div>
+        </div>
+
     </div>
 
 </body>

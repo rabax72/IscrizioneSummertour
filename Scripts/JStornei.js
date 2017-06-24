@@ -8,11 +8,13 @@
 
     //});
 
-    //$(".aggiornaVotanti").click(function () {
+    $(".addPlayerInTeam").click(function () {
 
-    //    GetVotanti();
+        var idTorneo = $(this).attr("data-idtorneo");
+        var idSquadra = $(this).attr("data-idsquadra");
+        console.log('idTorneo=' + idTorneo + ' idSquadra=' + idSquadra);
 
-    //});
+    });
 
     $(".linkHome").click(function () {
         GetTornei();
@@ -22,8 +24,8 @@
         var idTorneo = $("#TorneoScelto").attr("idtorneo");
         var idCategoria = $("option:checked").val()
         GetDettaglioCategoria(idTorneo, idCategoria);
-    });
-       
+    });       
+    
 });
 
 function GetTornei() {
@@ -241,7 +243,7 @@ function GetDettaglioCategoria(idTorneo, idCategoria) {
                 var idSquadra = risultati[i].idSquadra;
                 idSquadre.push(idSquadra);
 
-                GetGiocatoriByIdSquadra(idSquadra);
+                GetGiocatoriByIdSquadra(idSquadra, idTorneo);
             }
             
             var squadreId = idSquadre.join();
@@ -269,7 +271,7 @@ function GetDettaglioCategoria(idTorneo, idCategoria) {
 
 }
 
-function GetGiocatoriByIdSquadra(idSquadra) {
+function GetGiocatoriByIdSquadra(idSquadra, idTorneo) {
 
     $.ajax({
         type: "POST",
@@ -284,7 +286,7 @@ function GetGiocatoriByIdSquadra(idSquadra) {
         // dataType: "jsonp",            
         async: true,
         //            data: "idDisciplina=" + idDisciplina,
-        data: JSON.stringify({ idSquadra: idSquadra }),
+        data: JSON.stringify({ idSquadra: idSquadra, idTorneo: idTorneo }),
         //data: { NomeOrdinanza: NomeOrdinanza, DataPubbDa: DataPubbDa, DataPubbA: DataPubbA, DataScadDa: DataScadDa, DataScadA: DataScadA },
         error: function (data) {
             console.log(data.responseText)
@@ -316,11 +318,62 @@ function GetGiocatoriByIdSquadra(idSquadra) {
                                         '<td>' + referente + '</td>' +
                                         '</tr>';                
             }
-            giocatori = giocatori + '<tr><td colspan="3"><a href="#" class="ui-btn ui-btn-inline" id="addPlayerInTeam_' + idSquadra + '">Aggiungiti a questa squadra</a></td></tr>';
+            giocatori = giocatori + '<tr><td colspan="3"><a href="javascript:formPlayerInTeam(' + idSquadra + ', ' + idTorneo + ');" class="ui-btn ui-btn-inline " data-idtorneo="' + idTorneo + '" data-idsquadra="' + idSquadra + '">Aggiungiti a questa squadra</a></td></tr>';
             giocatori = giocatori + '</table>';
 
             $('#idsquadra_' + idSquadra).html(giocatori);
 
+        }
+
+    })
+
+}
+
+function formPlayerInTeam(idSquadra, idTorneo) {
+
+    $.mobile.changePage("#paginaIscrizioneGiocatoreInSquadra", { transition: "slideup", changeHash: false });
+    addPlayerInTeam(idTorneo, idSquadra);
+}
+
+function addPlayerInTeam(idTorneo, idSquadra) {
+
+    $.ajax({
+        type: "POST",
+        crossDomain: true,
+        contentType: "application/json; charset=utf-8",      
+        //        url: "Ws_AppElezioni.asmx/GetVotanti",
+        url: urlDatiInserimentoGiocatoreInSquadra,
+        cache: false,
+        //jsonpCallback: 'risposta',
+        // jsonp: 'callback',
+        // dataType: "jsonp",            
+        async: true,
+        //            data: "idDisciplina=" + idDisciplina,
+        data: JSON.stringify({ idTorneo: idTorneo, idSquadra: idSquadra }),
+        //data: { NomeOrdinanza: NomeOrdinanza, DataPubbDa: DataPubbDa, DataPubbA: DataPubbA, DataScadDa: DataScadDa, DataScadA: DataScadA },
+        error: function (data) {
+            console.log(data.responseText)
+        },
+        beforeSend: function () { $('#nomeTorneoDelGiocatore').html(''); $.mobile.loading('show'); }, //Show spinner
+        complete: function () { $.mobile.loading('hide'); }, //Hide spinner
+        success: function (response) {
+            risultati = response.d;
+            //corsiGlobal = response.d;           
+
+            //console.log(risultati);
+           
+            var nomeTorneo = '';
+            var categoria = '';
+            var squadra = '';
+            for (var i = 0; i < risultati.length; i++) {
+                nomeTorneo = risultati[i].Torneo;
+                categoria = risultati[i].Categoria;
+                squadra = risultati[i].NomeSquadra;
+            }
+
+            $('#nomeTorneoDelGiocatore').html('<i class="fa fa-trophy"></i> ' + nomeTorneo);
+            $('#nomeCategoriaDelGiocatore').html('<i class="fa fa-bars"></i> ' + categoria);
+            $('#nomeSquadraDelGiocatore').html('<i class="fa fa-users"></i> ' + squadra);
         }
 
     })
