@@ -120,6 +120,7 @@ function GetDettaglioTorneo(idTorneo) {
                 $('#TorneoScelto').attr("idtorneo", idTorneo);
                 var descCategoria = '';
                 var descPagamento = '';
+                var descTermineIscrizione = risultati[i].Fine;
                 for (var z = 0; z < risultati[i].Categorie.length; z++) {
                     dettaglio = dettaglio + '<option value="' + risultati[i].Categorie[z].idCategoria + '">' +
                                 risultati[i].Categorie[z].Categoria +
@@ -134,6 +135,7 @@ function GetDettaglioTorneo(idTorneo) {
             $("#categorieTorneo").html(dettaglio);
             $("#DescCategoriaTorneo").html(descCategoria);
             $("#DescPagamentoCategoria").html(descPagamento);
+            $("#descTermineIscrizione").html('Termine ultimo per l\'scrizione il ' + descTermineIscrizione);
             
             $.mobile.changePage("#dettTorneo", { transition: "slideup", changeHash: false });
             //$('#elencoTornei').empty();
@@ -229,7 +231,7 @@ function GetDettaglioCategoria(idTorneo, idCategoria) {
             var elencoSquadre = '';
             for (var i = 0; i < risultati.length; i++) {
                 elencoSquadre = elencoSquadre + '<div data-role="collapsible">';
-                elencoSquadre = elencoSquadre + '<h2>' + risultati[i].NomeSquadra + '</h2>';
+                elencoSquadre = elencoSquadre + '<h2>' + risultati[i].NomeSquadra + '<span class="ui-li-count giocatoriSquadra_' + risultati[i].idSquadra + '">1</span></h2>';
                 elencoSquadre = elencoSquadre + '<ul data-role="listview" data-inset="true" data-shadow="false">';
                 elencoSquadre = elencoSquadre +'<li data-iconpos="right" data-inset="false">';
                 
@@ -243,7 +245,7 @@ function GetDettaglioCategoria(idTorneo, idCategoria) {
                 var idSquadra = risultati[i].idSquadra;
                 idSquadre.push(idSquadra);
 
-                GetGiocatoriByIdSquadra(idSquadra, idTorneo);
+                GetGiocatoriByIdSquadra(idSquadra, idTorneo, idCategoria);
             }
             
             var squadreId = idSquadre.join();
@@ -271,7 +273,7 @@ function GetDettaglioCategoria(idTorneo, idCategoria) {
 
 }
 
-function GetGiocatoriByIdSquadra(idSquadra, idTorneo) {
+function GetGiocatoriByIdSquadra(idSquadra, idTorneo, idCategoria) {
 
     $.ajax({
         type: "POST",
@@ -286,7 +288,7 @@ function GetGiocatoriByIdSquadra(idSquadra, idTorneo) {
         // dataType: "jsonp",            
         async: true,
         //            data: "idDisciplina=" + idDisciplina,
-        data: JSON.stringify({ idSquadra: idSquadra, idTorneo: idTorneo }),
+        data: JSON.stringify({ idSquadra: idSquadra, idTorneo: idTorneo, idCategoria: idCategoria }),
         //data: { NomeOrdinanza: NomeOrdinanza, DataPubbDa: DataPubbDa, DataPubbA: DataPubbA, DataScadDa: DataScadDa, DataScadA: DataScadA },
         error: function (data) {
             console.log(data.responseText)
@@ -300,13 +302,19 @@ function GetGiocatoriByIdSquadra(idSquadra, idTorneo) {
             //console.log(risultati);
             var giocatori = '<table>';
             var tipoCertificato = '';
+            var maxGiocatori = '';
+            var numeroGiocatori = 0;
+            var limiteGiocatori = '';
             for (var i = 0; i < risultati.length; i++) {
                 if (risultati[i].certificatoPresente == 'themes/images/certificato_assente.png') {
                     tipoCertificato = 'Certificato non caricato o non in regola!';
                 } else {
                     tipoCertificato = 'Certificato in regola!';
                 }
-
+                maxGiocatori = risultati[i].maxNumeroGiocatori;
+                if (maxGiocatori == "") {
+                    maxGiocatori = risultati[i].numGiocatoriMinimo;
+                }
                 var referente = '';
                 if (risultati[i].pathImgReferente != '') {
                     referente = '<img src="' + risultati[i].pathImgReferente + '" alt="Referente della Squadra" title="Referente della Squadra" />';
@@ -316,12 +324,18 @@ function GetGiocatoriByIdSquadra(idSquadra, idTorneo) {
                                         '<td>' + risultati[i].Cognome.toUpperCase() + ' ' + risultati[i].Nome.toUpperCase() + '</td>' +
                                         '<td><img src="' + risultati[i].certificatoPresente + '" alt="' + tipoCertificato + '" title="' + tipoCertificato + '" /></td>' +
                                         '<td>' + referente + '</td>' +
-                                        '</tr>';                
+                                        '</tr>';
+                numeroGiocatori = numeroGiocatori + 1;
+                if (parseInt(maxGiocatori) == numeroGiocatori) {
+                    limiteGiocatori = 'ui-state-disabled';
+                }
             }
-            giocatori = giocatori + '<tr><td colspan="3"><a href="javascript:formPlayerInTeam(' + idSquadra + ', ' + idTorneo + ');" class="ui-btn ui-btn-inline " data-idtorneo="' + idTorneo + '" data-idsquadra="' + idSquadra + '">Aggiungiti a questa squadra</a></td></tr>';
+            giocatori = giocatori + '<tr><td colspan="3"><a href="javascript:formPlayerInTeam(' + idSquadra + ', ' + idTorneo + ');" class="ui-btn ui-btn-inline ' + limiteGiocatori + '" data-idtorneo="' + idTorneo + '" data-idsquadra="' + idSquadra + '">Aggiungiti a questa squadra</a></td></tr>';
             giocatori = giocatori + '</table>';
 
             $('#idsquadra_' + idSquadra).html(giocatori);
+
+            $('.giocatoriSquadra_' + idSquadra).html(risultati.length);
 
         }
 
@@ -374,6 +388,30 @@ function addPlayerInTeam(idTorneo, idSquadra) {
             $('#nomeTorneoDelGiocatore').html('<i class="fa fa-trophy"></i> ' + nomeTorneo);
             $('#nomeCategoriaDelGiocatore').html('<i class="fa fa-bars"></i> ' + categoria);
             $('#nomeSquadraDelGiocatore').html('<i class="fa fa-users"></i> ' + squadra);
+            $('#idSquadraIscrizione').val(idSquadra);
+            $('#idTorneoIscrizione').val(idTorneo);
+
+            //carico i Profili
+            if (localStorage.CF.length > 0 && localStorage.CF.length == 16) {
+
+                $('#cfGiocatore').val(localStorage.CF);
+
+                $('#profiloGiocatore').append('<option value="' + localStorage.CF + '" selected>' + localStorage.CF + '</option>');
+            }
+            if (localStorage.CF.length > 16) {
+
+                var cf = localStorage.CF.split("_");
+                var ultimo = '';
+                for (var i = 0; i < cf.length; i++) {
+                    $('#cfGiocatore').val(cf[i]);
+                    if (i == cf.length-1) {
+                        ultimo = 'selected';
+                    }
+                    $('#profiloGiocatore').append('<option value="' + cf[i] + '" ' + ultimo + '>' + cf[i] + '</option>');
+                }
+                //getAnagraficaGiocatore(localStorage.CF)
+            }
+            $('#profiloGiocatore').selectmenu('refresh');
         }
 
     })

@@ -4,8 +4,8 @@
 <widget xmlns     = "http://www.w3.org/ns/widgets"
         xmlns:gap = "http://phonegap.com/ns/1.0"
         id        = "app_iscrizione_summertour"
-        versionCode = "15"
-        version   = "0.4.5">
+        versionCode = "16"
+        version   = "0.4.6">
 
   <name>Iscrizione Summertour</name>
 

@@ -10,8 +10,9 @@ if (tipoDiAmbiente == 'locale') {
     var urlElencoGiocatori = 'WS_AppSummertour.asmx/GetGiocatoriByIdSquadra';
     var urlDatiInserimentoGiocatoreInSquadra = 'WS_AppSummertour.asmx/GetDatiInserimentoGiocatoreInSquadra';
     var urlgetAnagraficaGiocatore = 'WS_AppSummertour.asmx/GetAnagraficaGiocatore';
+    var urlSalvaGiocatoreInSquadra = 'WS_AppSummertour.asmx/SalvaGiocatoreInSquadra';
+    var urlElencoTipiCampionato = 'WS_AppSummertour.asmx/GetElencoCampionati';
 }
-
 
 if (tipoDiAmbiente == 'prod') {
     var urlImmagini = 'http://www.giacomorabaglia.com/appIscrizioneSummertour/';
@@ -22,4 +23,6 @@ if (tipoDiAmbiente == 'prod') {
     var urlElencoGiocatori = 'http://www.giacomorabaglia.com/appIscrizioneSummertour/WS_AppSummertour.asmx/GetGiocatoriByIdSquadra';
     var urlDatiInserimentoGiocatoreInSquadra = 'http://www.giacomorabaglia.com/appIscrizioneSummertour/WS_AppSummertour.asmx/GetDatiInserimentoGiocatoreInSquadra';
     var urlgetAnagraficaGiocatore = 'http://www.giacomorabaglia.com/appIscrizioneSummertour/WS_AppSummertour.asmx/GetAnagraficaGiocatore';
+    var urlSalvaGiocatoreInSquadra = 'http://www.giacomorabaglia.com/appIscrizioneSummertour/WS_AppSummertour.asmx/SalvaGiocatoreInSquadra';
+    var urlElencoTipiCampionato = 'http://www.giacomorabaglia.com/appIscrizioneSummertour/WS_AppSummertour.asmx/GetElencoCampionati';
 }
