@@ -11,10 +11,32 @@
     $("#chekCFAddPlayerInTeam").click(function () {
 
         var cf = $("#cfGiocatore").val();
-        getAnagraficaGiocatore(cf);
+        var idSquadra = $('#idSquadraIscrizione').val();
+        var giocatori = $('#giocatoriNellaSquadra_' + idSquadra).val();
+        if (giocatori.indexOf(cf) == -1) {
+            getAnagraficaGiocatore(cf);
+        } else {
+            $('#messaggioCF').html('Questo giocatore è già presente in questa squadra!');
+        }
+        
         //console.log('cfGiocatore=' + cf );
-
     });
+
+    $("#chekCFAddNewTeam").click(function () {
+
+        var cf = $("#cfGiocatoreSquadra").val();
+        var nomeSquadra = $('#nomeNuovaSquadra').val();
+
+        if (nomeSquadra.length == 0) {
+            $("#messaggioCFsquadra").html('Inserire un Nome di Squadra!');
+            return;
+        }
+
+        getAnagraficaGiocatoreSquadra(cf);
+
+        //console.log('cfGiocatore=' + cf );
+    });
+
 
     $('#profiloGiocatore').change(function () {
 
@@ -31,8 +53,149 @@
           
 });
 
-function chiudiPop() {
-    $("#popupDialog").dialog("close")
+function getAnagraficaGiocatoreSquadra(CF) {
+    //$("#footerRisultati").loader({ html: "<span class='ui-icon ui-icon-loading'><img src='jquery-logo.png' /><h2>is loading for you ...</h2></span>" });
+    var risultati;
+    var inAttesa = $('#SquadraInAttesa').val();
+    $("#messaggioCFsquadra").html('');
+    if (CF.length != 16) {
+        $("#messaggioCFsquadra").html('Codice Fiscale inserito nel formato sbagliato.');
+        return;
+    }
+
+    $.ajax({
+        type: "POST",
+        crossDomain: true,
+        contentType: "application/json; charset=utf-8",
+        //url: "https://webservices.comune.parma.it/APPPM/WS_ACI/GetAci",
+        //        url: "Ws_AppElezioni.asmx/GetVotanti",
+        url: urlgetAnagraficaGiocatore,
+        cache: false,
+        //jsonpCallback: 'risposta',
+        // jsonp: 'callback',
+        // dataType: "jsonp",            
+        async: true,
+        //            data: "idDisciplina=" + idDisciplina,
+        data: JSON.stringify({ CF: CF }),
+        //data: { NomeOrdinanza: NomeOrdinanza, DataPubbDa: DataPubbDa, DataPubbA: DataPubbA, DataScadDa: DataScadDa, DataScadA: DataScadA },
+        error: function (data) {
+            console.log(data.responseText)
+        },
+        beforeSend: function () { $('#datiNuovoGiocatoreSquadra').html(''); $.mobile.loading('show'); }, //Show spinner
+        complete: function () { $.mobile.loading('hide'); }, //Hide spinner
+        success: function (response) {
+            risultati = response.d;
+
+            //console.log(risultati);
+
+            var idGiocatore = '0';
+            var nomeGiocatore = '0';
+            var idTorneo = $('#idTorneoSquadra').val();
+            var idCategoria = $('#idCategoriaSquadra').val();
+            var nomeSquadra = $('#nomeNuovaSquadra').val();
+
+            var dettaglio = '<h3 class="ui-bar ui-bar-a ui-corner-all">Dati Anagrafici</h3>';
+
+            for (var i = 0; i < risultati.length; i++) {
+
+                idGiocatore = risultati[i].id;
+                nomeGiocatore = risultati[i].Nome + ' ' + risultati[i].Cognome;
+
+                dettaglio = dettaglio + '<table>' +
+                                        '<tbody>' +
+                                        '<tr>' +
+                                        '<td>Nome</td>' +
+                                        '<td><input type="text" id="nomeGiocatore" data-clear-btn="true" value="' + risultati[i].Nome + '" class="testoMaiuscolo" /></td>' +
+                                        '</tr>' +
+                                        '<tr>' +
+                                        '<td>Cognome</td>' +
+                                        '<td><input type="text" id="cognomeGiocatore" data-clear-btn="true" value="' + risultati[i].Cognome + '" class="testoMaiuscolo" /></td>' +
+                                        '</tr>' +
+                                        '<tr>' +
+                                        '<td>Telefono</td>' +
+                                        '<td><input type="text" id="telefonoGiocatore" data-clear-btn="true" value="' + risultati[i].Telefono + '" class="testoMaiuscolo" /></td>' +
+                                        '</tr>' +
+                                        '<tr>' +
+                                        '<td>Ultimo campionato FIPAV disputato</td>' +
+                                        '<td><select id="ultimoCampionatoSquadra">' +
+                                        '<option></option>' +
+                                        '</select></td>' +
+                                        '</tr>' +
+                                        '<tr>' +
+                                        '<td>Email</td>' +
+                                        '<td><input type="text" id="emailGiocatore" data-clear-btn="true" value="' + risultati[i].Email + '" /></td>' +
+                                        '</tr>' +
+                                        '<tr>' +
+                                        '<td>Data Ril.</td>' +
+                                        '<td><input type="date" id="dataRilascioCertifcatoGiocatore" value="' + isoDate(risultati[i].dataRilascioCertifcato.substring(0, 10)) + '" class="testoMaiuscolo" /></td>' +
+                                        '</tr>' +
+                                        '<tr>' +
+                                        '<td>Data Scad.</td>' +
+                                        '<td><input type="date" id="dataScadenzaCertifcatoGiocatore" value="' + isoDate(risultati[i].dataScadenzaCertifcato.substring(0, 10)) + '" class="testoMaiuscolo" /> <i class="fa fa-check-circle-o" aria-hidden="true"></i></td>' +
+                                        '</tr>' +
+                                        '<tr>' +
+                                        '<td>Certificato Medico</td>' +
+                                        '<td>' +
+                                        '<a href="http:////www.giacomorabaglia.com/iscrizionesummertour/adminarea/EstraiCM.aspx?nomeF=' + risultati[i].nomeFileCertificato + '" data-transition="fade" target="_blank">' +
+                                        '<i class="fa fa-file-text-o" aria-hidden="true"></i>' +
+                                        '</a>' +                                        
+                                        '</td>' +
+                                        '</tr>' +
+                                        '</tbody>' +
+                                        '</table>' +
+                                        '<div><a href="javascript:AggiungiSquadra(' + idTorneo + ', ' + idCategoria + ', \'' + nomeSquadra + '\', \'' + inAttesa + '\');" class="ui-shadow ui-btn ui-corner-all ui-btn-inline" id="salvaAddPlayerInTeam">Completa la Registrazione</a></div>' +
+                            '';
+            }
+
+            if (risultati.length == 0) {
+                
+                dettaglio = dettaglio + '<table>' +
+                                        '<tbody>' +
+                                        '<tr>' +
+                                        '<td>Nome</td>' +
+                                        '<td><input type="text" id="nomeGiocatore" data-clear-btn="true" value="" class="testoMaiuscolo" /></td>' +
+                                        '</tr>' +
+                                        '<tr>' +
+                                        '<td>Cognome</td>' +
+                                        '<td><input type="text" id="cognomeGiocatore" data-clear-btn="true" value="" class="testoMaiuscolo" /></td>' +
+                                        '</tr>' +
+                                        '<tr>' +
+                                        '<td>Telefono</td>' +
+                                        '<td><input type="text" id="telefonoGiocatore" data-clear-btn="true" value="" class="testoMaiuscolo" /></td>' +
+                                        '</tr>' +
+                                        '<tr>' +
+                                        '<td>Ultimo campionato FIPAV disputato</td>' +
+                                        '<td><select id="ultimoCampionatoSquadra">' +
+                                        '<option></option>' +
+                                        '</select></td>' +
+                                        '</tr>' +
+                                        '<tr>' +
+                                        '<td>Email</td>' +
+                                        '<td><input type="text" id="emailGiocatore" data-clear-btn="true" value="" /></td>' +
+                                        '</tr>' +
+                                        '<tr>' +
+                                        '<td>Data Ril.</td>' +
+                                        '<td><input type="date" id="dataRilascioCertifcatoGiocatore" value="" class="testoMaiuscolo" /></td>' +
+                                        '</tr>' +
+                                        '<tr>' +
+                                        '<td>Data Scad.</td>' +
+                                        '<td><input type="date" id="dataScadenzaCertifcatoGiocatore" value="" class="testoMaiuscolo" /></td>' +
+                                        '</tr>' +
+                                        '</tbody>' +
+                                        '</table>' +
+                                        '<div><a href="javascript:AggiungiSquadra(' + idTorneo + ', ' + idCategoria + ', \'' + nomeSquadra + '\', \'' + inAttesa + '\'));" class="ui-shadow ui-btn ui-corner-all ui-btn-inline" id="salvaAddPlayerInTeam">Completa la Registrazione</a></div>' +
+                            '';
+            }
+
+            $('#idGiocatoreSquadra').val(idGiocatore);
+
+            $('#datiNuovoGiocatoreSquadra').html(dettaglio);
+
+            GetElencoCampionati('ultimoCampionatoSquadra');
+
+        }
+
+    })
 }
 
 function getAnagraficaGiocatore(CF) {
@@ -72,7 +235,7 @@ function getAnagraficaGiocatore(CF) {
             var idGiocatore = '0';
             var nomeGiocatore = '0';
             var idSquadra = $('#idSquadraIscrizione').val();
-            var idCampionato = $('#idSquadraIscrizione').val();
+            //var idCampionato = $('#idTorneoIscrizione').val();
             
             var dettaglio = '<h3 class="ui-bar ui-bar-a ui-corner-all">Dati Anagrafici</h3>' +
                             '<table>';
@@ -103,7 +266,7 @@ function getAnagraficaGiocatore(CF) {
                                         '</tr>' +
                                         '<tr>' +
                                         '<td>Email</td>' +
-                                        '<td><input type="text" id="emailGiocatore" data-clear-btn="true" value="' + risultati[i].Email + '" class="testoMaiuscolo" /></td>' +
+                                        '<td><input type="text" id="emailGiocatore" data-clear-btn="true" value="' + risultati[i].Email + '" /></td>' +
                                         '</tr>' +
                                         '<tr>' +
                                         '<td>Data Ril.</td>' +
@@ -116,12 +279,9 @@ function getAnagraficaGiocatore(CF) {
                                         '<tr>' +
                                         '<td>Certificato Medico</td>' +
                                         '<td>' +
-                                        '<a href="#popup' + idGiocatore + '" data-rel="popup" data-position-to="window" data-transition="fade">' +
-                                        '<i class="fa fa-file-text-o" aria-hidden="true"></i>' +                                        
+                                        '<a href="http:////www.giacomorabaglia.com/iscrizionesummertour/adminarea/EstraiCM.aspx?nomeF=' + risultati[i].nomeFileCertificato + '" data-transition="fade" target="_blank">' +
+                                        '<i class="fa fa-file-text-o" aria-hidden="true"></i>' +
                                         '</a>' +
-                                        '<div data-role="popup" id="popup' + idGiocatore + '" data-overlay-theme="b" data-theme="b" data-corners="false">' +
-                                        '<a href="#" data-rel="back" class="ui-btn ui-corner-all ui-shadow ui-btn-a ui-icon-delete ui-btn-icon-notext ui-btn-right">Close</a><img class="http:////www.giacomorabaglia.com/iscrizionesummertour/adminarea/EstraiCM.aspx?nomeF=' + risultati[i].nomeFileCertificato + '" style="max-height:512px;" alt="Certificato Medico">' +
-                                        '</div>' +
                                         '</td>' +
                                         '</tr>' +
                                         '</tbody>' +
@@ -131,6 +291,7 @@ function getAnagraficaGiocatore(CF) {
             }
 
             if (risultati.length == 0) {
+                idGiocatore = '0';
                 dettaglio = dettaglio + '<tbody>' +
                                         '<tr>' +
                                         '<td>Nome</td>' +
@@ -152,7 +313,7 @@ function getAnagraficaGiocatore(CF) {
                                         '</tr>' +
                                         '<tr>' +
                                         '<td>Email</td>' +
-                                        '<td><input type="text" id="emailGiocatore" data-clear-btn="true" value="" class="testoMaiuscolo" /></td>' +
+                                        '<td><input type="text" id="emailGiocatore" data-clear-btn="true" value="" /></td>' +
                                         '</tr>' +
                                         '<tr>' +
                                         '<td>Data Ril.</td>' +
@@ -164,20 +325,22 @@ function getAnagraficaGiocatore(CF) {
                                         '</tr>' +
                                         '</tbody>' +
                                         '</table>' +
-                                        '<div><a href="javascript:AggiungiGiocatoreAllaSquadra();" class="ui-shadow ui-btn ui-corner-all ui-btn-inline" id="salvaAddPlayerInTeam">Salva</a></div>' +
+                                        '<div><a href="javascript:AggiungiGiocatoreAllaSquadra(' + idSquadra + ', ' + idGiocatore + ');" class="ui-shadow ui-btn ui-corner-all ui-btn-inline" id="salvaAddPlayerInTeam">Completa la Registrazione</a></div>' +
                             '';
             }
             
+            $('#idGiocatoreSquadra').val($(idGiocatore));
+
             $('#datiNuovoGiocatore').html($(dettaglio));
            
-            GetElencoCampionati();
+            GetElencoCampionati('ultimoCampionato');
                       
         }
 
     })
 }
 
-function GetElencoCampionati() {
+function GetElencoCampionati(nomeSelect) {
 
     $.ajax({
         type: "POST",
@@ -194,7 +357,7 @@ function GetElencoCampionati() {
         error: function (data) {
             console.log(data.responseText)
         },
-        beforeSend: function () { $('#ultimoCampionato').html(''); $.mobile.loading('show'); }, //Show spinner
+        beforeSend: function () { $('#' + nomeSelect).html(''); $.mobile.loading('show'); }, //Show spinner
         complete: function () { $.mobile.loading('hide'); }, //Hide spinner
         success: function (response) {
             risultati = response.d;
@@ -210,11 +373,149 @@ function GetElencoCampionati() {
                                                  
             }
 
-            $("#ultimoCampionato").html(dettaglio);           
+            $("#" + nomeSelect).html(dettaglio);
         }
 
     })
 
+}
+
+function AggiungiSquadra(idTorneo, idCategoria, nomeSquadra) {
+    var idCampionato = $("#ultimoCampionatoSquadra").val();
+    var inAttesa = $('#SquadraInAttesa').val();
+    //var dataScad = $("#dataScadenzaCertifcatoSquadra").val();
+    //console.log(dataScad);
+
+    //salvo la Squadra
+    $.ajax({
+        type: "POST",
+        crossDomain: true,
+        contentType: "application/json; charset=utf-8",
+        //url: "https://webservices.comune.parma.it/APPPM/WS_ACI/GetAci",
+        //        url: "Ws_AppElezioni.asmx/GetVotanti",
+        url: urlSalvaSquadra,
+        cache: false,
+        //jsonpCallback: 'risposta',
+        // jsonp: 'callback',
+        // dataType: "jsonp",            
+        async: true,
+        //            data: "idDisciplina=" + idDisciplina,
+        data: JSON.stringify({ idTorneo: idTorneo, idCategoria: idCategoria, nomeSquadra: nomeSquadra, inAttesa: inAttesa }),
+        //data: { NomeOrdinanza: NomeOrdinanza, DataPubbDa: DataPubbDa, DataPubbA: DataPubbA, DataScadDa: DataScadDa, DataScadA: DataScadA },
+        error: function (data) {
+            console.log(data.responseText)
+        },
+        beforeSend: function () { $('#elencoTornei').html(''); $.mobile.loading('show'); }, //Show spinner
+        complete: function () { $.mobile.loading('hide'); }, //Hide spinner
+        success: function (response) {
+            idSquadra = response.d;
+            //corsiGlobal = response.d;           
+            var dettaglio = '';
+            //console.log(risultati);
+
+            //aggiungo il CF in memoria per i prossimi accessi
+            var profili = localStorage.CF;
+            var cfCorrente = $('#cfGiocatoreSquadra').val().toUpperCase();
+            if (profili == null) {
+                localStorage.CF = cfCorrente;
+            } else {
+                //console.log(profili.indexOf(cfCorrente));
+                if (profili.indexOf(cfCorrente) == -1) {
+                    localStorage.CF = localStorage.CF + '_' + cfCorrente;
+                }
+            }
+
+            salvaCurriculum(idSquadra);
+                        
+        }
+
+    })
+
+}
+
+function salvaCurriculum(idSquadra) {
+    var idGiocatore = $('#idGiocatoreSquadra').val();
+    var nome = $('#nomeGiocatore').val();
+    var cognome = $('#cognomeGiocatore').val();
+    var CF = $('#cfGiocatoreSquadra').val();
+    var email = $('#emailGiocatore').val();
+    var telefono = $('#telefonoGiocatore').val();
+
+    var idTorneo = $('#idTorneoSquadra').val();
+    var idCategoria = $('#idCategoriaSquadra').val();
+    var nomeSquadra = $('#nomeNuovaSquadra').val();
+
+    if (idGiocatore == 0) {
+        //Inserisco una nuova Anagrafica        
+        $.ajax({
+            type: "POST",
+            crossDomain: true,
+            contentType: "application/json; charset=utf-8",
+            //url: "https://webservices.comune.parma.it/APPPM/WS_ACI/GetAci",
+            //        url: "Ws_AppElezioni.asmx/GetVotanti",
+            url: urlSalvaAnagraficaNew,
+            cache: false,
+            //jsonpCallback: 'risposta',
+            // jsonp: 'callback',
+            // dataType: "jsonp",            
+            async: true,
+            //            data: "idDisciplina=" + idDisciplina,
+            data: JSON.stringify({ nome: nome, cognome: cognome, CF: CF, email: email, telefono: telefono }),
+            //data: { NomeOrdinanza: NomeOrdinanza, DataPubbDa: DataPubbDa, DataPubbA: DataPubbA, DataScadDa: DataScadDa, DataScadA: DataScadA },
+            error: function (data) {
+                console.log(data.responseText)
+            },
+            beforeSend: function () { $('#elencoTornei').html(''); $.mobile.loading('show'); }, //Show spinner
+            complete: function () { $.mobile.loading('hide'); }, //Hide spinner
+            success: function (response) {
+                idGiocatoreNew = response.d;
+                //corsiGlobal = response.d;           
+                var dettaglio = '';
+                //console.log(risultati);
+                $('#idGiocatoreSquadra').val(idGiocatoreNew);
+                salvaCurriculum(idSquadra);
+            }
+
+        })
+
+    } else {
+        //Inserisco il Curriculum e il referente
+        var idAnagrafica = $('#idGiocatoreSquadra').val();
+        var idCampionato = $('#ultimoCampionatoSquadra').val();
+        $.ajax({
+            type: "POST",
+            crossDomain: true,
+            contentType: "application/json; charset=utf-8",
+            //url: "https://webservices.comune.parma.it/APPPM/WS_ACI/GetAci",
+            //        url: "Ws_AppElezioni.asmx/GetVotanti",
+            url: urlSalvaCurriculum,
+            cache: false,
+            //jsonpCallback: 'risposta',
+            // jsonp: 'callback',
+            // dataType: "jsonp",            
+            async: true,
+            //            data: "idDisciplina=" + idDisciplina,
+            data: JSON.stringify({ idSquadra: idSquadra, idAnagrafica: idAnagrafica, idCampionato: idCampionato, idTorneo: idTorneo, idCategoria: idCategoria, nomeSquadra: nomeSquadra, nome: nome, cognome: cognome, telefono: telefono, email: email }),
+            //data: { NomeOrdinanza: NomeOrdinanza, DataPubbDa: DataPubbDa, DataPubbA: DataPubbA, DataScadDa: DataScadDa, DataScadA: DataScadA },
+            error: function (data) {
+                console.log(data.responseText)
+            },
+            beforeSend: function () { $('#elencoTornei').html(''); $.mobile.loading('show'); }, //Show spinner
+            complete: function () { $.mobile.loading('hide'); }, //Hide spinner
+            success: function (response) {
+                idSquadra = response.d;
+                //corsiGlobal = response.d;           
+                var dettaglio = '';
+                //console.log(risultati);
+
+                $.mobile.changePage("#ConfermaIscrizione", { transition: "slideup", changeHash: false });
+
+            }
+
+        })
+    }
+
+    
 }
 
 function AggiungiGiocatoreAllaSquadra(idSquadra, idGiocatore) {
@@ -250,10 +551,15 @@ function AggiungiGiocatoreAllaSquadra(idSquadra, idGiocatore) {
             //console.log(risultati);
 
             //aggiungo il CF in memoria per i prossimi accessi
-            if (localStorage.CF == "") {
-                localStorage.CF = $('#cfGiocatore').val();
+            var profili = localStorage.CF;
+            var cfCorrente = $('#cfGiocatore').val().toUpperCase();
+            if (profili == null) {
+                localStorage.CF = cfCorrente;
             } else {
-                localStorage.CF = localStorage.CF + '_' +$('#cfGiocatore').val();
+                //console.log(profili.indexOf(cfCorrente));
+                if (profili.indexOf(cfCorrente) == -1) {
+                    localStorage.CF = localStorage.CF + '_' + cfCorrente;
+                }
             }
             
             $.mobile.changePage("#ConfermaIscrizione", { transition: "slideup", changeHash: false });
@@ -263,6 +569,44 @@ function AggiungiGiocatoreAllaSquadra(idSquadra, idGiocatore) {
         }
 
     })
+
+}
+
+function formNewTeam(idTorneo, idCategoria) {
+
+    $.mobile.changePage("#IscrizioneNuovaSquadra", { transition: "slideup", changeHash: false });
+    $('#idTorneoSquadra').val(idTorneo);
+    $('#idCategoriaSquadra').val(idCategoria);
+    
+    caricaProfili();
+}
+
+function caricaProfili() {
+
+    //carico i Profili
+    $('#profiloCapoSquadra').html('<option value="">< crea un nuovo profilo ></option>');
+    if (localStorage.CF != null) {
+        if (localStorage.CF.length > 0 && localStorage.CF.length == 16) {
+
+            $('#cfGiocatoreSquadra').val(localStorage.CF);
+
+            $('#profiloCapoSquadra').append('<option value="' + localStorage.CF.toUpperCase() + '" selected>' + localStorage.CF.toUpperCase() + '</option>');
+        }
+        if (localStorage.CF.length > 16) {
+
+            var cf = localStorage.CF.split("_");
+            var ultimo = '';
+            for (var i = 0; i < cf.length; i++) {
+                $('#cfGiocatoreSquadra').val(cf[i]);
+                if (i == cf.length - 1) {
+                    ultimo = 'selected';
+                }
+                $('#profiloCapoSquadra').append('<option value="' + cf[i].toUpperCase() + '" ' + ultimo + '>' + cf[i].toUpperCase() + '</option>');
+            }
+            //getAnagraficaGiocatore(localStorage.CF)
+        }
+    }
+    $('#profiloCapoSquadra').selectmenu('refresh');
 
 }
 

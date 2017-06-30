@@ -24,9 +24,22 @@
         var idTorneo = $("#TorneoScelto").attr("idtorneo");
         var idCategoria = $("option:checked").val()
         GetDettaglioCategoria(idTorneo, idCategoria);
-    });       
+        $("#buttonAddNewTeam").attr("href", "javascript:formNewTeam(" + idTorneo + ", " + idCategoria + ")");
+    });
+
+    $(document).on("pageshow", "#ConfermaIscrizione", function () { // When entering pagetwo
+        //alert("pagetwo is now shown");
+        setTimeout(cambiaPagina, 3000);
+    });
+    
     
 });
+
+function cambiaPagina() {
+    GetTornei();
+    $.mobile.changePage("#landing", { transition: "slideup", changeHash: false });
+
+}
 
 function GetTornei() {
     //$("#footerRisultati").loader({ html: "<span class='ui-icon ui-icon-loading'><img src='jquery-logo.png' /><h2>is loading for you ...</h2></span>" });
@@ -113,10 +126,11 @@ function GetDettaglioTorneo(idTorneo) {
             risultati = response.d;
             //corsiGlobal = response.d;           
             var dettaglio = '';
-            //console.log(risultati);
+            var nomeTorneo = '';
 
             for (var i = 0; i < risultati.length; i++) {
-                $('#TorneoScelto').html(risultati[i].Nometorneo);
+                nomeTorneo = risultati[i].Nometorneo;
+                $('#TorneoScelto').html(nomeTorneo);
                 $('#TorneoScelto').attr("idtorneo", idTorneo);
                 var descCategoria = '';
                 var descPagamento = '';
@@ -137,6 +151,12 @@ function GetDettaglioTorneo(idTorneo) {
             $("#DescPagamentoCategoria").html(descPagamento);
             $("#descTermineIscrizione").html('Termine ultimo per l\'scrizione il ' + descTermineIscrizione);
             
+            //creo il link per l'iscrizione di una nuova squadra
+            $("#buttonAddNewTeam").attr("href", "javascript:formNewTeam(" + idTorneo + ", " + $("#categorieTorneo").val() + ")");
+            $('.nomeTorneoDelGiocatore').html('<i class="fa fa-trophy"></i> ' + nomeTorneo);
+            $("#backIscrizioneNuovaSquadra").attr("href", "javascript:javascript:GetDettaglioTorneo(" + idTorneo + ")");
+            
+
             $.mobile.changePage("#dettTorneo", { transition: "slideup", changeHash: false });
             //$('#elencoTornei').empty();
             //$('#elencoTornei').append($(dettaglio));
@@ -180,6 +200,7 @@ function GetDettaglioCategoria(idTorneo, idCategoria) {
             var dettaglio = '';
             //console.log(risultati);
 
+            var nomeCategoria = '';
             var descCategoria = '';
             var descPagamento = '';
             var squadreIscritte = '';
@@ -187,6 +208,7 @@ function GetDettaglioCategoria(idTorneo, idCategoria) {
             for (var i = 0; i < risultati.length; i++) {
                 $('#TorneoScelto').html(risultati[i].Nometorneo);
                 
+                nomeCategoria = risultati[i].Categoria;
                 descCategoria = risultati[i].DescCategoria;
                 descPagamento = risultati[i].DescPagamento;
                 squadreIscritte = risultati[i].NumeroSquadreIscritte;
@@ -197,6 +219,14 @@ function GetDettaglioCategoria(idTorneo, idCategoria) {
             $("#DescPagamentoCategoria").html(descPagamento);
             $(".squadreIscritte").html(squadreIscritte);
             $(".postiLiberi").html(postiLiberi);
+            
+            var inAttesa = "no";
+            if (postiLiberi == 0) {
+                inAttesa = "si";
+            }
+            $('#SquadraInAttesa').val(inAttesa);
+
+            $('.nomeCategoriaDelGiocatore').html('<i class="fa fa-bars"></i> ' + nomeCategoria);
         }
 
     })
@@ -240,6 +270,7 @@ function GetDettaglioCategoria(idTorneo, idCategoria) {
                 elencoSquadre = elencoSquadre + '</ul>';
                 elencoSquadre = elencoSquadre + '</li>';
                 elencoSquadre = elencoSquadre + '</ul>';
+                elencoSquadre = elencoSquadre + '<input type="hidden" id="giocatoriNellaSquadra_' + risultati[i].idSquadra + '" />';
                 elencoSquadre = elencoSquadre + '</div>';
                 //GetGiocatoriByIdSquadra(risultati[i].idSquadra);
                 var idSquadra = risultati[i].idSquadra;
@@ -305,6 +336,7 @@ function GetGiocatoriByIdSquadra(idSquadra, idTorneo, idCategoria) {
             var maxGiocatori = '';
             var numeroGiocatori = 0;
             var limiteGiocatori = '';
+            var CfGiocatori = '';
             for (var i = 0; i < risultati.length; i++) {
                 if (risultati[i].certificatoPresente == 'themes/images/certificato_assente.png') {
                     tipoCertificato = 'Certificato non caricato o non in regola!';
@@ -329,6 +361,12 @@ function GetGiocatoriByIdSquadra(idSquadra, idTorneo, idCategoria) {
                 if (parseInt(maxGiocatori) == numeroGiocatori) {
                     limiteGiocatori = 'ui-state-disabled';
                 }
+
+                if (i == 0) {
+                    CfGiocatori = risultati[i].CodiceFiscale;
+                } else {
+                    CfGiocatori = CfGiocatori + '_' + risultati[i].CodiceFiscale;
+                }
             }
             giocatori = giocatori + '<tr><td colspan="3"><a href="javascript:formPlayerInTeam(' + idSquadra + ', ' + idTorneo + ');" class="ui-btn ui-btn-inline ' + limiteGiocatori + '" data-idtorneo="' + idTorneo + '" data-idsquadra="' + idSquadra + '">Aggiungiti a questa squadra</a></td></tr>';
             giocatori = giocatori + '</table>';
@@ -336,6 +374,8 @@ function GetGiocatoriByIdSquadra(idSquadra, idTorneo, idCategoria) {
             $('#idsquadra_' + idSquadra).html(giocatori);
 
             $('.giocatoriSquadra_' + idSquadra).html(risultati.length);
+
+            $('#giocatoriNellaSquadra_' + idSquadra).val(CfGiocatori);
 
         }
 
@@ -368,7 +408,7 @@ function addPlayerInTeam(idTorneo, idSquadra) {
         error: function (data) {
             console.log(data.responseText)
         },
-        beforeSend: function () { $('#nomeTorneoDelGiocatore').html(''); $.mobile.loading('show'); }, //Show spinner
+        beforeSend: function () { $('.nomeTorneoDelGiocatore').html(''); $.mobile.loading('show'); }, //Show spinner
         complete: function () { $.mobile.loading('hide'); }, //Hide spinner
         success: function (response) {
             risultati = response.d;
@@ -385,31 +425,37 @@ function addPlayerInTeam(idTorneo, idSquadra) {
                 squadra = risultati[i].NomeSquadra;
             }
 
-            $('#nomeTorneoDelGiocatore').html('<i class="fa fa-trophy"></i> ' + nomeTorneo);
-            $('#nomeCategoriaDelGiocatore').html('<i class="fa fa-bars"></i> ' + categoria);
-            $('#nomeSquadraDelGiocatore').html('<i class="fa fa-users"></i> ' + squadra);
+            $('.nomeTorneoDelGiocatore').html('<i class="fa fa-trophy"></i> ' + nomeTorneo);
+            $('.nomeCategoriaDelGiocatore').html('<i class="fa fa-bars"></i> ' + categoria);
+            $('.nomeSquadraDelGiocatore').html('<i class="fa fa-users"></i> ' + squadra);
             $('#idSquadraIscrizione').val(idSquadra);
             $('#idTorneoIscrizione').val(idTorneo);
 
+            $('#backIscrizioneInSquadra').attr("href", "javascript:GetDettaglioTorneo(" + idSquadra + ")");
+            $('#backConfermaIscrizione').attr("href", "javascript:GetDettaglioTorneo(" + idSquadra + ")");            
+
             //carico i Profili
-            if (localStorage.CF.length > 0 && localStorage.CF.length == 16) {
+            $('#profiloGiocatore').html('<option value="">< crea un nuovo profilo ></option>');
+            if (localStorage.CF != null) {
+                if (localStorage.CF.length > 0 && localStorage.CF.length == 16) {
 
-                $('#cfGiocatore').val(localStorage.CF);
+                    $('#cfGiocatore').val(localStorage.CF);
 
-                $('#profiloGiocatore').append('<option value="' + localStorage.CF + '" selected>' + localStorage.CF + '</option>');
-            }
-            if (localStorage.CF.length > 16) {
-
-                var cf = localStorage.CF.split("_");
-                var ultimo = '';
-                for (var i = 0; i < cf.length; i++) {
-                    $('#cfGiocatore').val(cf[i]);
-                    if (i == cf.length-1) {
-                        ultimo = 'selected';
-                    }
-                    $('#profiloGiocatore').append('<option value="' + cf[i] + '" ' + ultimo + '>' + cf[i] + '</option>');
+                    $('#profiloGiocatore').append('<option value="' + localStorage.CF.toUpperCase() + '" selected>' + localStorage.CF.toUpperCase() + '</option>');
                 }
-                //getAnagraficaGiocatore(localStorage.CF)
+                if (localStorage.CF.length > 16) {
+
+                    var cf = localStorage.CF.split("_");
+                    var ultimo = '';
+                    for (var i = 0; i < cf.length; i++) {
+                        $('#cfGiocatore').val(cf[i]);
+                        if (i == cf.length - 1) {
+                            ultimo = 'selected';
+                        }
+                        $('#profiloGiocatore').append('<option value="' + cf[i].toUpperCase() + '" ' + ultimo + '>' + cf[i].toUpperCase() + '</option>');
+                    }
+                    //getAnagraficaGiocatore(localStorage.CF)
+                }
             }
             $('#profiloGiocatore').selectmenu('refresh');
         }

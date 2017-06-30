@@ -18,8 +18,9 @@
 <body>
     <div data-role="page" id="landing" data-theme="a">
 		<div data-role="header" data-position="inline" class="barra">
-			<h1>Summertour 2017</h1>
-            <a href="#" id="logoDx" class="ui-btn"></a>
+            <a href="index.html" class="ui-btn ui-shadow ui-corner-all ui-icon-summer ui-btn-icon-notext">Delete</a>
+			<h1>Summertour 2017</h1>            
+            <a href="index.html" class="ui-btn ui-shadow ui-corner-all ui-icon-summer ui-btn-icon-notext">Delete</a>
 		</div>
         <div>&nbsp;</div>
 		<div>            
@@ -97,29 +98,14 @@
             </div>
 
             <div>
-                <a href="#IscrizioneTorneo" class="ui-btn ui-corner-all ui-shadow">Iscrivi la tua squadra in questa categoria</a>
+                <a href="#" id="buttonAddNewTeam" class="ui-btn ui-corner-all ui-shadow">Iscrivi la tua squadra in questa categoria</a>
             </div>
-        </div>       
-    </div>
-
-    <div data-role="page" id="IscrizioneTorneo" data-theme="a">
-		<div data-role="header" data-position="inline">
-            <a href="#dettTorneo" data-icon="arrow-l" class="ui-btn-left" id="A1" data-rel="back">Back</a>
-			<h1>Summertour 2017</h1>
-            <h1 id="H1">Iscrizione</h1>
-
-		</div>
-        <div>&nbsp;</div>
-		<div>            
-            <ul data-role="listview" data-inset="true" id="Ul1">
-                    
-            </ul>           
         </div>       
     </div>
 
     <div data-role="page" id="paginaIscrizioneGiocatoreInSquadra" data-theme="a">
 		<div data-role="header" data-position="inline">
-            <a href="index.html" data-icon="arrow-l" class="ui-btn-left" data-rel="back">Back</a>
+            <a href="" data-icon="arrow-l" class="ui-btn-left" id="backIscrizioneInSquadra">Back</a>
 			<h1>Summertour 2017</h1>
             <h1 id="headerIscrizioneInSquadra">Iscrizione</h1>
             
@@ -127,9 +113,9 @@
         <div>&nbsp;</div>
         <div class="ui-body ui-body-a ui-corner-all">
             <div>
-                <a href="#" class="ui-btn ui-btn-inline" id="nomeTorneoDelGiocatore"></a>
-                <a href="#" class="ui-btn ui-btn-inline" id="nomeCategoriaDelGiocatore"></a>
-                <a href="#" class="ui-btn ui-btn-inline" id="nomeSquadraDelGiocatore"></a>
+                <a href="#" class="ui-btn ui-btn-inline nomeTorneoDelGiocatore"></a>
+                <a href="#" class="ui-btn ui-btn-inline nomeCategoriaDelGiocatore"></a>
+                <a href="#" class="ui-btn ui-btn-inline nomeSquadraDelGiocatore"></a>
                 <br />
                 Benvenuto/a,<br />
                 procedi all'iscrizione in questa squadra scegliendo un profilo o creane uno nuovo difgitando il Codice Fiscale.
@@ -143,6 +129,7 @@
                 </select>
                 <label for="cfGiocatore" id="labelCfGiocatore">Inserisci il tuo C.F.</label>     
                 <input type="text" maxlength="16" name="text-basic" id="cfGiocatore" data-clear-btn="true" value="" class="testoMaiuscolo" />                   
+                
             </div>       
             <div>
                 <a href="#" class="ui-shadow ui-btn ui-corner-all ui-btn-inline" id="chekCFAddPlayerInTeam">Avanti</a>
@@ -160,16 +147,66 @@
 
     </div>
 
+    <div data-role="page" id="IscrizioneNuovaSquadra" data-theme="a">
+		<div data-role="header" data-position="inline">
+            <a href="#" data-icon="arrow-l" class="ui-btn-left" id="backIscrizioneNuovaSquadra">Back</a>
+			<h1>Summertour 2017</h1>
+            <h1 id="h3">Iscrizione Squadra</h1>
+            
+		</div>
+        <div>&nbsp;</div>
+        <div class="ui-body ui-body-a ui-corner-all">
+            <div class="ui-field-contain">
+                <a href="#" class="ui-btn ui-btn-inline nomeTorneoDelGiocatore"></a>
+                <a href="#" class="ui-btn ui-btn-inline nomeCategoriaDelGiocatore"></a>
+                
+                <br />
+                Benvenuto/a, procedi all'iscrizione della tua squadra.
+            </div>
+            <div class="ui-field-contain">
+                <label for="nomeNuovaSquadra" id="label3">Nome Squadra</label>     
+                <input type="text" maxlength="16" name="text-basic" id="nomeNuovaSquadra" data-clear-btn="true" value="" />                   
+
+                <input type="hidden" id="idTorneoSquadra" />
+                <input type="hidden" id="idCategoriaSquadra" />
+                <input type="hidden" id="SquadraInAttesa" />
+                <input type="hidden" id="idGiocatoreSquadra" />
+            </div>
+		    <div class="ui-field-contain">      
+                <label for="profiloGiocatore" id="label1">Usa questo profilo</label>   
+                <select id="profiloCapoSquadra">
+                    <option value="">< crea un nuovo profilo ></option>
+                </select>
+                <label for="cfGiocatoreSquadra" id="label2">Inserisci il tuo C.F.</label>     
+                <input type="text" maxlength="16" name="text-basic" id="cfGiocatoreSquadra" data-clear-btn="true" value="" class="testoMaiuscolo" />                                   
+            </div>       
+            <div>
+                <a href="#" class="ui-shadow ui-btn ui-corner-all ui-btn-inline" id="chekCFAddNewTeam">Avanti</a>
+                <div id="messaggioCFsquadra"></div>
+            </div>
+        </div>
+
+        <div>&nbsp;</div>
+
+        <div class="ui-body ui-body-a ui-corner-all">
+            <div id="datiNuovoGiocatoreSquadra">
+
+            </div>
+        </div>
+
+    </div>
+
     <div data-role="page" id="ConfermaIscrizione" data-theme="a">
 		<div data-role="header" data-position="inline">
-            <a href="#dettTorneo" data-icon="arrow-l" class="ui-btn-left" id="A2" data-rel="back">Back</a>
+            <a href="" data-icon="arrow-l" class="ui-btn-left" id="backConfermaIscrizione">Back</a>
 			<h1>Summertour 2017</h1>
             <h1 id="H2">Conferma Iscrizione</h1>
 
 		</div>
         <div>&nbsp;</div>
-		<div>            
-            <p>La tua iscrizione è stata registrata correttamente!</p>          
+		<div class="center_image">            
+            <p>La tua iscrizione è stata registrata correttamente!</p>  
+            <img src="themes/images/checked-checkbox-512.gif" />
         </div>       
     </div>
 
