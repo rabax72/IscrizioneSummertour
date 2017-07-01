@@ -22,9 +22,17 @@
         //console.log('cfGiocatore=' + cf );
     });
 
+    $("#cfGiocatoreSquadra").keyup(function () {
+        if ($("#cfGiocatoreSquadra").val().length == 16) {
+            $("#chekCFAddNewTeam").click();
+        }
+    });
+
     $("#chekCFAddNewTeam").click(function () {
 
-        var cf = $("#cfGiocatoreSquadra").val();
+        var idTorneo = $("#idTorneoSquadra").val();
+        var idCategoria = $("#idCategoriaSquadra").val();
+        var CF = $("#cfGiocatoreSquadra").val();
         var nomeSquadra = $('#nomeNuovaSquadra').val();
 
         if (nomeSquadra.length == 0) {
@@ -32,7 +40,8 @@
             return;
         }
 
-        getAnagraficaGiocatoreSquadra(cf);
+        VerificaGiocatoreGiaIscritto(idTorneo, idCategoria, CF);
+        //getAnagraficaGiocatoreSquadra(cf);
 
         //console.log('cfGiocatore=' + cf );
     });
@@ -52,6 +61,44 @@
     });
           
 });
+
+function VerificaGiocatoreGiaIscritto(idTorneo, idCategoria, CF) {
+
+    $.ajax({
+        type: "POST",
+        crossDomain: true,
+        contentType: "application/json; charset=utf-8",
+        //url: "https://webservices.comune.parma.it/APPPM/WS_ACI/GetAci",
+        //        url: "Ws_AppElezioni.asmx/GetVotanti",
+        url: urlVerificaGiocatoreGiaIscritto,
+        cache: false,
+        //jsonpCallback: 'risposta',
+        // jsonp: 'callback',
+        // dataType: "jsonp",            
+        async: true,
+        //            data: "idDisciplina=" + idDisciplina,
+        data: JSON.stringify({ idTorneo: idTorneo, idCategoria: idCategoria, CF: CF }),
+        //data: { NomeOrdinanza: NomeOrdinanza, DataPubbDa: DataPubbDa, DataPubbA: DataPubbA, DataScadDa: DataScadDa, DataScadA: DataScadA },
+        error: function (data) {
+            console.log(data.responseText)
+        },
+        beforeSend: function () { $('#idsquadra_').html(''); $.mobile.loading('show'); }, //Show spinner
+        complete: function () { $.mobile.loading('hide'); }, //Hide spinner
+        success: function (response) {
+            risultati = response.d;
+            //corsiGlobal = response.d;           
+
+            //console.log(risultati);
+            if (risultati > 0) {
+                $('#messaggioCFsquadra').html('Risulti già iscritto a questo Torneo in questa categoria.');
+                return;
+            }
+            getAnagraficaGiocatoreSquadra(CF);
+        }
+
+    })
+
+}
 
 function getAnagraficaGiocatoreSquadra(CF) {
     //$("#footerRisultati").loader({ html: "<span class='ui-icon ui-icon-loading'><img src='jquery-logo.png' /><h2>is loading for you ...</h2></span>" });
@@ -607,6 +654,8 @@ function caricaProfili() {
         }
     }
     $('#profiloCapoSquadra').selectmenu('refresh');
+
+    $('#nomeNuovaSquadra').html('');
 
 }
 

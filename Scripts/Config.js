@@ -15,6 +15,7 @@ if (tipoDiAmbiente == 'locale') {
     var urlSalvaSquadra = 'WS_AppSummertour.asmx/SalvaSquadra';
     var urlSalvaAnagraficaNew = 'WS_AppSummertour.asmx/SalvaAnagraficaNew';
     var urlSalvaCurriculum = 'WS_AppSummertour.asmx/SalvaCurriculum';
+    var urlVerificaGiocatoreGiaIscritto = 'WS_AppSummertour.asmx/VerificaGiocatoreGiaIscritto';
 }
 
 if (tipoDiAmbiente == 'prod') {
@@ -31,4 +32,5 @@ if (tipoDiAmbiente == 'prod') {
     var urlSalvaSquadra = 'http://www.giacomorabaglia.com/appIscrizioneSummertour/WS_AppSummertour.asmx/SalvaSquadra';
     var urlSalvaAnagraficaNew = 'http://www.giacomorabaglia.com/appIscrizioneSummertour/WS_AppSummertour.asmx/SalvaAnagraficaNew';
     var urlSalvaCurriculum = 'http://www.giacomorabaglia.com/appIscrizioneSummertour/WS_AppSummertour.asmx/SalvaCurriculum';
+    var urlVerificaGiocatoreGiaIscritto = 'http://www.giacomorabaglia.com/appIscrizioneSummertour/WS_AppSummertour.asmx/VerificaGiocatoreGiaIscritto';
 }
